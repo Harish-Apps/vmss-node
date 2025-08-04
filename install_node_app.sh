@@ -109,4 +109,8 @@ systemctl daemon-reload
 systemctl enable nodeapp
 systemctl restart nodeapp
 
+<<<<<<< HEAD
 echo "[install_node_app.sh] Application installed and running."
+=======
+echo "[install_node_app.sh] Application installed and running."
+>>>>>>> 4a64e6d7b14313dc91e252534bfe2014a7f562f1
