@@ -1,0 +1,36 @@
+#!/bin/bash
+set -euo pipefail
+
+if [ $# -ne 3 ]; then
+  echo "Usage: $0 <resource-group> <vmss-name> <location>"
+  exit 1
+fi
+
+RG=$1
+VMSS=$2
+LOCATION=$3
+
+az login --service-principal -u "$AZURE_CLIENT_ID" -p "$AZURE_CLIENT_SECRET" --tenant "$AZURE_TENANT_ID"
+az account set --subscription "$AZURE_SUBSCRIPTION_ID"
+
+az group create --name $RG --location $LOCATION
+
+az vmss create \
+  --resource-group $RG \
+  --name $VMSS \
+  --image UbuntuLTS \
+  --admin-username azureuser \
+  --generate-ssh-keys \
+  --instance-count 2 \
+  --vm-sku Standard_DS1_v2 \
+  --upgrade-policy-mode automatic \
+  --public-ip-per-vm \
+  --lb-sku Standard \
+  --ports 80
+
+# Run setup on all instances
+az vmss run-command invoke \
+  --resource-group $RG \
+  --name $VMSS \
+  --command-id RunShellScript \
+  --scripts @setup_node.sh
