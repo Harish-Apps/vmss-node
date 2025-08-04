@@ -28,7 +28,7 @@ az vmss create \
   --upgrade-policy-mode automatic \
   --public-ip-per-vm \
   --lb-sku Standard \
-  --ports 80
+  --backend-port 80
 
 # Run setup on all instances
 az vmss run-command invoke \

@@ -20,6 +20,21 @@ The script will:
 2. Create a resource group and a two-instance VM Scale Set
 3. Run `setup_node.sh` on each VM to install Node.js and register a systemd service
 
+By default the script configures the load balancer to forward HTTP traffic with the `--backend-port 80` option in the `az vmss create` call. If you prefer to expose port 80 using a network security group rule instead, run:
+
+```bash
+NSG="${VMSS}-nsg"
+az network nsg rule create \
+  --resource-group "$RG" \
+  --nsg-name "$NSG" \
+  --name allow-http \
+  --priority 1000 \
+  --protocol Tcp \
+  --destination-port-ranges 80 \
+  --access Allow \
+  --direction Inbound
+```
+
 ## 2. Configure GitHub Actions
 Add the following secrets to your repository so the pipeline can deploy:
 
