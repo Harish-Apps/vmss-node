@@ -1,1 +1,0 @@
-# vmss-node
