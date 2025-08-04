@@ -1,0 +1,10 @@
+{
+  "name": "vmss-node-app",
+  "version": "1.0.0",
+  "description": "Sample Node.js app for VMSS deployment",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "PORT=3000 node server.js & pid=$!; sleep 1; curl -f http://localhost:3000 > /tmp/test.log; kill $pid"
+  }
+}
