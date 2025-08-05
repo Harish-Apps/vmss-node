@@ -1,10 +1,12 @@
 locals {
   hub_configs = { for r, cfg in var.regions : r => cfg.hub }
-  spoke_configs = {
-    for r, cfg in var.regions :
-    for env, spoke in cfg.spokes :
-    "${r}-${env}" => merge(spoke, { region = r, env = env })
-  }
+
+  spoke_configs = merge([
+    for r, cfg in var.regions : {
+      for env, spoke in cfg.spokes :
+      "${r}-${env}" => merge(spoke, { region = r, env = env })
+    }
+  ]...)
 }
 
 module "hub" {
