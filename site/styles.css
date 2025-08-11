@@ -1,0 +1,13 @@
+body {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  margin-top: 50px;
+}
+.images img {
+  width: 100px;
+  height: 100px;
+  margin: 10px;
+}
+a {
+  color: #0066cc;
+}

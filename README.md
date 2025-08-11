@@ -1,58 +1,60 @@
-# VMSS Node.js Example
+# Azure Storage Static Website with Front Door
 
-This project provisions an Azure Virtual Machine Scale Set (VMSS) and deploys a simple Node.js web application. The application serves static HTML/CSS/JS from the root path.
+This repository contains a minimal static website and helper script to deploy it to an Azure Storage account and accelerate it through Azure Front Door.
 
-## Prerequisites
-- [Azure CLI](https://learn.microsoft.com/cli/azure/install-azure-cli) installed locally
-- An Azure service principal with **Client ID**, **Client Secret**, **Tenant ID**, and **Subscription ID**
-- GitHub repository secrets configured for deployment (see below)
+## Project Structure
 
-## 1. Provision infrastructure
-Update the placeholders in `agent.cli` with your Azure credentials and desired resource names, then run the script locally:
-
-```bash
-chmod +x agent.cli
-./agent.cli
+```
+site/
+  index.html
+  404.html
+  styles.css
+  images/
+    red-square.svg
+    blue-square.svg
+deploy.sh
+README.md
 ```
 
-The script will:
-1. Authenticate to Azure using the service principal
-2. Create a resource group and a two-instance VM Scale Set
-3. Run `setup_node.sh` on each VM to install Node.js and register a systemd service
+## Running Locally
 
-By default the script configures the load balancer to forward HTTP traffic with the `--backend-port 80` option in the `az vmss create` call. If you prefer to expose port 80 using a network security group rule instead, run:
+Serve the site locally to verify the content before deploying:
 
 ```bash
-NSG="${VMSS}-nsg"
-az network nsg rule create \
-  --resource-group "$RG" \
-  --nsg-name "$NSG" \
-  --name allow-http \
-  --priority 1000 \
-  --protocol Tcp \
-  --destination-port-ranges 80 \
-  --access Allow \
-  --direction Inbound
+python -m http.server --directory site 8000
 ```
 
-## 2. Configure GitHub Actions
-Add the following secrets to your repository so the pipeline can deploy:
+Visit <http://localhost:8000> in your browser.
 
-- `AZURE_CLIENT_ID`
-- `AZURE_CLIENT_SECRET`
-- `AZURE_TENANT_ID`
-- `AZURE_SUBSCRIPTION_ID`
-- `AZURE_RESOURCE_GROUP` (matches the `RG` in `agent.cli`)
-- `VMSS_NAME` (matches the `VMSS` in `agent.cli`)
+## Deploy using Azure Portal
 
-## 3. Deploy application
-Push or merge changes to the `main` branch. The workflow defined in `.github/workflows/deploy.yml` runs tests and then deploys the latest code to every VM in the scale set.
+1. **Create a Storage Account**
+   - Sign in to the [Azure portal](https://portal.azure.com/).
+   - Create a new Storage Account (kind: StorageV2) in your resource group and region of choice.
+2. **Enable Static Website Hosting**
+   - In the storage account, open **Static website** under **Data management**.
+   - Enable the feature and set:
+     - *Index document*: `index.html`
+     - *Error document*: `404.html`
+   - Note the **Primary endpoint** URL; this serves your site.
+3. **Upload Site Files**
+   - Navigate to the `$web` container created by enabling the static website.
+   - Upload the contents of the `site/` directory (keeping the folder structure).
+4. **Verify the Site**
+   - Browse to the primary endpoint URL to confirm the site works.
+5. **Create an Azure Front Door**
+   - In the portal, create a **Front Door and CDN profile** (Standard/Premium) in the same subscription.
+   - Inside the profile, create an **Origin group** and add an **Origin** pointing to your storage account's static website endpoint (host name without `https://`).
+   - Create an **Endpoint** and add a **Route** that maps the endpoint to the origin group.
+   - Once deployment completes, use the Front Door endpoint hostname to access your site via the CDN.
 
-Once the workflow completes, visit the public IP of any instance to see the app.
+## Optional: Deploy with Azure CLI
 
-## Testing locally
+The `deploy.sh` script automates the steps above. You need the Azure CLI logged in (`az login`). Execute:
+
 ```bash
-npm test
+./deploy.sh
 ```
 
-The test starts the server on port 3000 and ensures it responds successfully.
+The script creates a resource group, storage account, enables the static website, uploads the `site/` contents, and configures an Azure Front Door profile with a default route.
+
