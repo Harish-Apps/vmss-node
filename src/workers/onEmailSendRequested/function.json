@@ -1,0 +1,11 @@
+{
+  "bindings": [
+    {
+      "type": "serviceBusTrigger",
+      "direction": "in",
+      "name": "message",
+      "queueName": "email-send-requested",
+      "connection": "SERVICE_BUS_CONNECTION"
+    }
+  ]
+}

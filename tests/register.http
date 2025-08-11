@@ -1,0 +1,9 @@
+### Register user
+POST http://localhost:7071/api/register
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "secret123"
+}

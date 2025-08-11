@@ -1,0 +1,12 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "node",
+    "JWT_SECRET": "local-secret",
+    "SERVICE_BUS_CONNECTION": "<service-bus-connection-string>",
+    "COSMOS_CONNECTION": "<cosmos-connection-string>",
+    "APPINSIGHTS_CONNECTION_STRING": "<app-insights-connection>",
+    "JWT_ISSUER": "simple-auth-demo"
+  }
+}

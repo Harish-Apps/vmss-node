@@ -1,2 +1,12 @@
 node_modules/
+dist/
+local.settings.json
+.env
+coverage/
+
+# Logs
+npm-debug.log*
+*.log
+
+# OS
 .DS_Store

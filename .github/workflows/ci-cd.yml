@@ -1,0 +1,42 @@
+name: CI-CD
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test
+
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    environment: prod
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm ci
+      - run: npm run build
+      - uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: Deploy Function App
+        uses: azure/functions-action@v1
+        with:
+          app-name: ${{ secrets.FUNCTIONAPP_NAME }}
+          package: './dist'
+      - name: Set app settings
+        run: |
+          az functionapp config appsettings set --name ${{ secrets.FUNCTIONAPP_NAME }} --resource-group ${{ secrets.RESOURCE_GROUP }} --settings SERVICE_BUS_CONNECTION=${{ secrets.SERVICE_BUS_CONNECTION }} COSMOS_CONNECTION=${{ secrets.COSMOS_CONNECTION }} JWT_SECRET=${{ secrets.JWT_SECRET }} APPINSIGHTS_CONNECTION_STRING=${{ secrets.APPINSIGHTS_CONNECTION_STRING }} JWT_ISSUER=simple-auth-demo

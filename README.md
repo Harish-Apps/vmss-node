@@ -1,58 +1,68 @@
-# VMSS Node.js Example
+# Event-Driven Azure Functions Demo
 
-This project provisions an Azure Virtual Machine Scale Set (VMSS) and deploys a simple Node.js web application. The application serves static HTML/CSS/JS from the root path.
+This repository contains a sample event-driven application built on **Azure Functions (Node.js 20, TypeScript)**. It demonstrates user registration and welcome email workflow using **Azure Service Bus**, **Cosmos DB**, **Application Insights**, and **Key Vault** secured secrets with simple **JWT authentication**.
 
-## Prerequisites
-- [Azure CLI](https://learn.microsoft.com/cli/azure/install-azure-cli) installed locally
-- An Azure service principal with **Client ID**, **Client Secret**, **Tenant ID**, and **Subscription ID**
-- GitHub repository secrets configured for deployment (see below)
-
-## 1. Provision infrastructure
-Update the placeholders in `agent.cli` with your Azure credentials and desired resource names, then run the script locally:
-
-```bash
-chmod +x agent.cli
-./agent.cli
+## Architecture
+```
+client --> [HTTP Function /api/register] --> Cosmos DB
+       \--> Service Bus queue: user-registered --> [onUserRegistered] --> Service Bus queue: email-send-requested --> [onEmailSendRequested]
 ```
 
-The script will:
-1. Authenticate to Azure using the service principal
-2. Create a resource group and a two-instance VM Scale Set
-3. Run `setup_node.sh` on each VM to install Node.js and register a systemd service
-
-By default the script configures the load balancer to forward HTTP traffic with the `--backend-port 80` option in the `az vmss create` call. If you prefer to expose port 80 using a network security group rule instead, run:
-
-```bash
-NSG="${VMSS}-nsg"
-az network nsg rule create \
-  --resource-group "$RG" \
-  --nsg-name "$NSG" \
-  --name allow-http \
-  --priority 1000 \
-  --protocol Tcp \
-  --destination-port-ranges 80 \
-  --access Allow \
-  --direction Inbound
+Sequence:
+```
+Client -> register -> UserRegistered event -> onUserRegistered -> EmailSendRequested event -> onEmailSendRequested -> EmailSent (log)
 ```
 
-## 2. Configure GitHub Actions
-Add the following secrets to your repository so the pipeline can deploy:
+## Local Development
 
-- `AZURE_CLIENT_ID`
-- `AZURE_CLIENT_SECRET`
-- `AZURE_TENANT_ID`
-- `AZURE_SUBSCRIPTION_ID`
-- `AZURE_RESOURCE_GROUP` (matches the `RG` in `agent.cli`)
-- `VMSS_NAME` (matches the `VMSS` in `agent.cli`)
+1. Install dependencies and tools:
+   ```bash
+   npm install
+   ```
+2. Copy `local.settings.json.example` to `local.settings.json` and fill in connection strings.
+3. Build and start the Functions host:
+   ```bash
+   npm start
+   ```
+4. Mint a test JWT:
+   ```bash
+   npm run token:mint
+   ```
+5. Send a request using `tests/register.http` (REST Client) or curl.
 
-## 3. Deploy application
-Push or merge changes to the `main` branch. The workflow defined in `.github/workflows/deploy.yml` runs tests and then deploys the latest code to every VM in the scale set.
+## Testing
 
-Once the workflow completes, visit the public IP of any instance to see the app.
-
-## Testing locally
+Run lint and unit tests:
 ```bash
 npm test
 ```
 
-The test starts the server on port 3000 and ensures it responds successfully.
+## Deployment
+
+### Infrastructure (Bicep)
+Deploy resources to a resource group:
+```bash
+az deployment group create \
+  --resource-group <rg> \
+  --template-file infra/bicep/main.bicep \
+  --parameters @infra/parameters/dev.json
+```
+
+### GitHub Actions
+Workflow `ci-cd.yml` builds, tests and deploys the Function App on pushes to `main`. Required secrets:
+- `AZURE_CREDENTIALS`
+- `RESOURCE_GROUP`
+- `FUNCTIONAPP_NAME`
+- `SERVICE_BUS_CONNECTION`
+- `COSMOS_CONNECTION`
+- `JWT_SECRET`
+- `APPINSIGHTS_CONNECTION_STRING`
+- `KEY_VAULT_NAME` (for reference)
+
+## Troubleshooting
+- Ensure Service Bus and Cosmos DB connection strings are valid.
+- Use Azure Portal to inspect dead-letter queues for failed messages.
+- Check Application Insights logs for detailed traces.
+
+## License
+MIT
