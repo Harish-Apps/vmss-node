@@ -1,0 +1,29 @@
+[
+  {
+    "name": "sql-deadlocks",
+    "type": "Microsoft.Insights/scheduledQueryRules",
+    "properties": {
+      "severity": 2,
+      "enabled": true,
+      "evaluationFrequency": "PT5M",
+      "scopes": ["<LOG_ANALYTICS_WORKSPACE_ID>"],
+      "source": {
+        "query": "AzureDiagnostics | where Category == 'SQLInsights' and action_name_s == 'Deadlock' | summarize count()",
+        "dataSourceId": "<LOG_ANALYTICS_WORKSPACE_ID>"
+      },
+      "schedule": {
+        "frequencyInMinutes": 5,
+        "timeWindowInMinutes": 5
+      },
+      "criteria": {
+        "allOf": [
+          {
+            "threshold": 0,
+            "operator": "GreaterThan",
+            "timeAggregation": "Total"
+          }
+        ]
+      }
+    }
+  }
+]

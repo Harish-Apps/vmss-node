@@ -1,0 +1,6 @@
+AzureDiagnostics
+| where Category == "SQLInsights"
+| where action_name_s == "QueryExecutionStatistics"
+| where duration_s > 5
+| project TimeGenerated, client_ip_s, statement_s, duration_s
+| sort by duration_s desc

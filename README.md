@@ -1,58 +1,50 @@
-# VMSS Node.js Example
+# Azure SQL Minimal Project
 
-This project provisions an Azure Virtual Machine Scale Set (VMSS) and deploys a simple Node.js web application. The application serves static HTML/CSS/JS from the root path.
+Opinionated Terraform setup for a private Azure SQL Database.
 
 ## Prerequisites
-- [Azure CLI](https://learn.microsoft.com/cli/azure/install-azure-cli) installed locally
-- An Azure service principal with **Client ID**, **Client Secret**, **Tenant ID**, and **Subscription ID**
-- GitHub repository secrets configured for deployment (see below)
+- Azure CLI
+- Terraform
+- Permissions to create resource groups, SQL, network and Log Analytics
 
-## 1. Provision infrastructure
-Update the placeholders in `agent.cli` with your Azure credentials and desired resource names, then run the script locally:
-
+## Quickstart
 ```bash
-chmod +x agent.cli
-./agent.cli
+./scripts/deploy.sh
 ```
 
-The script will:
-1. Authenticate to Azure using the service principal
-2. Create a resource group and a two-instance VM Scale Set
-3. Run `setup_node.sh` on each VM to install Node.js and register a systemd service
+## Private Access
+Connect from a VM or runner within the virtual network. No public endpoint is exposed.
 
-By default the script configures the load balancer to forward HTTP traffic with the `--backend-port 80` option in the `az vmss create` call. If you prefer to expose port 80 using a network security group rule instead, run:
+## Security Model
+- AAD administrator configured via Terraform
+- Contained AAD users managed through `sql/roles.sql`
+- No SQL logins are created
 
+## Backup and Restore
+- Point in time restore enabled by default
+- Toggle long term retention with `enable_ltr`
+- Restore example:
+  ```bash
+  az sql db restore --dest-name myrestore --name <db> --server <server> --time <timestamp>
+  ```
+
+## Disaster Recovery
+Auto-failover group can be enabled with `enable_failover_group`. To fail over:
 ```bash
-NSG="${VMSS}-nsg"
-az network nsg rule create \
-  --resource-group "$RG" \
-  --nsg-name "$NSG" \
-  --name allow-http \
-  --priority 1000 \
-  --protocol Tcp \
-  --destination-port-ranges 80 \
-  --access Allow \
-  --direction Inbound
+az sql failover-group set-primary --name <fog> --resource-group <rg> --server <dr-sql>
 ```
 
-## 2. Configure GitHub Actions
-Add the following secrets to your repository so the pipeline can deploy:
+## Monitoring
+- Diagnostic settings and auditing send logs to Log Analytics
+- Import alerts from `monitoring/alerts`
+- Sample KQL queries in `monitoring/kql`
 
-- `AZURE_CLIENT_ID`
-- `AZURE_CLIENT_SECRET`
-- `AZURE_TENANT_ID`
-- `AZURE_SUBSCRIPTION_ID`
-- `AZURE_RESOURCE_GROUP` (matches the `RG` in `agent.cli`)
-- `VMSS_NAME` (matches the `VMSS` in `agent.cli`)
-
-## 3. Deploy application
-Push or merge changes to the `main` branch. The workflow defined in `.github/workflows/deploy.yml` runs tests and then deploys the latest code to every VM in the scale set.
-
-Once the workflow completes, visit the public IP of any instance to see the app.
-
-## Testing locally
+## Performance
+Query Store and automatic tuning are enabled. Validate:
 ```bash
-npm test
+sqlcmd -S <server> -d <db> -C -i sql/query_store.sql
 ```
 
-The test starts the server on port 3000 and ensures it responds successfully.
+## Troubleshooting
+- Private DNS resolution failing: ensure your VM uses Azure DNS and the zone is linked
+- Missing AAD admin: verify `aad_admin_login` and `aad_admin_object_id` variables

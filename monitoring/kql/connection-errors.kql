@@ -1,0 +1,4 @@
+AzureDiagnostics
+| where Category == "SQLSecurityAuditEvents"
+| where action_id_s == "LOGIN_FAILED"
+| project TimeGenerated, client_ip_s, principal_name_s, result_description_s

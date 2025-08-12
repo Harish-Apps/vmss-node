@@ -1,0 +1,37 @@
+name: infra
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      - name: Terraform Init
+        run: terraform -chdir=infra/terraform init -backend-config=backend-example.hcl
+      - name: Terraform Fmt
+        run: terraform -chdir=infra/terraform fmt -check
+      - name: Terraform Validate
+        run: terraform -chdir=infra/terraform validate
+      - name: Terraform Plan
+        run: terraform -chdir=infra/terraform plan
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main'
+        run: terraform -chdir=infra/terraform apply -auto-approve
+      - name: Apply SQL
+        run: |
+          sqlcmd -S $(terraform -chdir=infra/terraform output -raw sql_server_fqdn) -d $(terraform -chdir=infra/terraform output -raw sql_database_name) -C -i sql/schema.sql
+          sqlcmd -S $(terraform -chdir=infra/terraform output -raw sql_server_fqdn) -d $(terraform -chdir=infra/terraform output -raw sql_database_name) -C -i sql/roles.sql

@@ -1,0 +1,44 @@
+[
+  {
+    "name": "sql-cpu-high",
+    "type": "Microsoft.Insights/metricAlerts",
+    "properties": {
+      "severity": 3,
+      "enabled": true,
+      "scopes": ["<SQL_SERVER_RESOURCE_ID>"],
+      "evaluationFrequency": "PT5M",
+      "windowSize": "PT5M",
+      "criteria": {
+        "allOf": [
+          {
+            "metricName": "cpu_percent",
+            "operator": "GreaterThan",
+            "threshold": 80,
+            "timeAggregation": "Average"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "sql-storage-high",
+    "type": "Microsoft.Insights/metricAlerts",
+    "properties": {
+      "severity": 3,
+      "enabled": true,
+      "scopes": ["<SQL_SERVER_RESOURCE_ID>"],
+      "evaluationFrequency": "PT5M",
+      "windowSize": "PT5M",
+      "criteria": {
+        "allOf": [
+          {
+            "metricName": "storage_percent",
+            "operator": "GreaterThan",
+            "threshold": 80,
+            "timeAggregation": "Average"
+          }
+        ]
+      }
+    }
+  }
+]
