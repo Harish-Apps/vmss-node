@@ -1,6 +1,6 @@
 # DevOps Cloud Engineer Blog on Azure Functions
 
-This repository contains a minimal personal blog for a DevOps/cloud engineer. The site is a single `index.html` page served through an Azure Function and shows the current time and the latest public GitHub repositories.
+This repository contains a personal blog for a DevOps/cloud engineer. The site is a single `index.html` page served through an Azure Function and shows the current time and the latest public GitHub repositories.
 
 ## Infrastructure Setup
 
@@ -21,7 +21,6 @@ The script creates a resource group, storage account and a Python Azure Function
 func start
 ```
 
-Browse to `http://localhost:7071` to view the blog.
 
 ## CI/CD
 

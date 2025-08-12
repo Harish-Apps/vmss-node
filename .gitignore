@@ -2,3 +2,4 @@ __pycache__/
 local.settings.json
 *.pyc
 .python_packages/
+.DS_Store
