@@ -1,58 +1,44 @@
-# VMSS Node.js Example
+# Personal Blog on Azure Functions
 
-This project provisions an Azure Virtual Machine Scale Set (VMSS) and deploys a simple Node.js web application. The application serves static HTML/CSS/JS from the root path.
+This project hosts a simple personal blog written in HTML and CSS and served through an Azure Function. Deployment is automated via GitHub Actions using the Azure Functions Core Tools.
 
-## Prerequisites
-- [Azure CLI](https://learn.microsoft.com/cli/azure/install-azure-cli) installed locally
-- An Azure service principal with **Client ID**, **Client Secret**, **Tenant ID**, and **Subscription ID**
-- GitHub repository secrets configured for deployment (see below)
+## Infrastructure Setup
 
-## 1. Provision infrastructure
-Update the placeholders in `agent.cli` with your Azure credentials and desired resource names, then run the script locally:
+Use the provided script to create the required Azure resources:
 
 ```bash
-chmod +x agent.cli
-./agent.cli
+./azure-setup.sh
 ```
 
-The script will:
-1. Authenticate to Azure using the service principal
-2. Create a resource group and a two-instance VM Scale Set
-3. Run `setup_node.sh` on each VM to install Node.js and register a systemd service
-
-By default the script configures the load balancer to forward HTTP traffic with the `--backend-port 80` option in the `az vmss create` call. If you prefer to expose port 80 using a network security group rule instead, run:
+This script runs:
 
 ```bash
-NSG="${VMSS}-nsg"
-az network nsg rule create \
-  --resource-group "$RG" \
-  --nsg-name "$NSG" \
-  --name allow-http \
-  --priority 1000 \
-  --protocol Tcp \
-  --destination-port-ranges 80 \
-  --access Allow \
-  --direction Inbound
+az group create --name functionRG --location centralindia
+az storage account create --name dhaappsaznefunc --location centralindia --resource-group functionRG --sku Standard_LRS
+az functionapp create --resource-group functionRG --consumption-plan-location centralindia --runtime python --runtime-version 3.10 --functions-version 4 --name dhaappsaznewf --os-type linux --storage-account dhaappsaznefunc
 ```
 
-## 2. Configure GitHub Actions
-Add the following secrets to your repository so the pipeline can deploy:
+## Local Development
 
-- `AZURE_CLIENT_ID`
-- `AZURE_CLIENT_SECRET`
-- `AZURE_TENANT_ID`
-- `AZURE_SUBSCRIPTION_ID`
-- `AZURE_RESOURCE_GROUP` (matches the `RG` in `agent.cli`)
-- `VMSS_NAME` (matches the `VMSS` in `agent.cli`)
+1. Install [Azure Functions Core Tools](https://learn.microsoft.com/azure/azure-functions/functions-run-local).
+2. Run the function locally:
 
-## 3. Deploy application
-Push or merge changes to the `main` branch. The workflow defined in `.github/workflows/deploy.yml` runs tests and then deploys the latest code to every VM in the scale set.
-
-Once the workflow completes, visit the public IP of any instance to see the app.
-
-## Testing locally
 ```bash
-npm test
+func start
 ```
 
-The test starts the server on port 3000 and ensures it responds successfully.
+Visit `http://localhost:7071` to view the blog.
+
+## CI/CD
+
+A GitHub Actions workflow (`.github/workflows/deploy.yml`) publishes the function app whenever changes are pushed to the `main` branch. The workflow requires a service principal stored in the repository secret `AZURE_CREDENTIALS`.
+
+## Access
+
+After a successful deployment, the blog is available at:
+
+```
+https://dhaappsaznewf.azurewebsites.net
+```
+
+Replace the function app name in the URL if you create a different one.
