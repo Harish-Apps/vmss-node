@@ -16,7 +16,7 @@ resource "azurerm_subnet" "private" {
   resource_group_name  = var.resource_group_name
   virtual_network_name = azurerm_virtual_network.vnet.name
   address_prefixes     = ["10.0.0.0/24"]
-  enforce_private_link_endpoint_network_policies = true
+  private_endpoint_network_policies_enabled = false
 }
 
 resource "azurerm_private_dns_zone" "sql" {

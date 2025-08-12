@@ -25,10 +25,6 @@ resource "azurerm_mssql_server" "primary" {
     login_username = var.aad_admin_login
     object_id      = var.aad_admin_object_id
   }
-
-  automatic_tuning {
-    desired_state = "AutoPilot"
-  }
 }
 
 resource "azurerm_mssql_server" "secondary" {
@@ -43,10 +39,17 @@ resource "azurerm_mssql_server" "secondary" {
     login_username = var.aad_admin_login
     object_id      = var.aad_admin_object_id
   }
+}
 
-  automatic_tuning {
-    desired_state = "AutoPilot"
-  }
+resource "azurerm_mssql_server_automatic_tuning" "primary" {
+  server_id     = azurerm_mssql_server.primary.id
+  desired_state = "Auto"
+}
+
+resource "azurerm_mssql_server_automatic_tuning" "secondary" {
+  count         = var.enable_failover_group ? 1 : 0
+  server_id     = azurerm_mssql_server.secondary[0].id
+  desired_state = "Auto"
 }
 
 locals {
@@ -90,12 +93,14 @@ resource "azurerm_mssql_server_extended_auditing_policy" "audit" {
 }
 
 resource "azurerm_mssql_server_security_alert_policy" "defender" {
-  count     = var.enable_defender ? 1 : 0
-  server_id = azurerm_mssql_server.primary.id
-  state     = "Enabled"
+  count               = var.enable_defender ? 1 : 0
+  resource_group_name = var.resource_group_name
+  server_name         = azurerm_mssql_server.primary.name
+  state               = "Enabled"
+  email_account_admins = true
 }
 
-resource "azurerm_sql_failover_group" "fog" {
+resource "azurerm_mssql_failover_group" "fog" {
   count               = var.enable_failover_group ? 1 : 0
   name                = "${var.project_name}-${var.env}-fog"
   resource_group_name = var.resource_group_name
@@ -108,10 +113,12 @@ resource "azurerm_sql_failover_group" "fog" {
   databases = [azurerm_mssql_database.db.id]
 }
 
-resource "azurerm_mssql_database_long_term_retention_policy" "ltr" {
-  count       = var.enable_ltr ? 1 : 0
-  database_id = azurerm_mssql_database.db.id
-  weekly_retention = "P1Y"
+resource "azurerm_sql_database_long_term_retention_policy" "ltr" {
+  count               = var.enable_ltr ? 1 : 0
+  resource_group_name = var.resource_group_name
+  server_name         = azurerm_mssql_server.primary.name
+  database_name       = azurerm_mssql_database.db.name
+  weekly_retention    = "P1Y"
 }
 
 output "server_id" {
