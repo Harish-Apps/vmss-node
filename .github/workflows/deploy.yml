@@ -2,7 +2,7 @@ name: Deploy to Azure Functions
 
 on:
   push:
-    branches: [main]
+    branches: [codex/remove-unnecessary-files-and-create-index.html]
 
 jobs:
   build-and-deploy:
