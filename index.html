@@ -3,430 +3,51 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>My Personal Blog · Enhanced</title>
-  <meta name="description" content="A single-file personal blog with live clock, theme toggle, dynamic details, and GitHub feed." />
+  <title>DevOps Cloud Engineer Blog</title>
   <style>
-    :root {
-      --bg: #0b1020;
-      --bg-soft: #11162b;
-      --surface: #151b34;
-      --text: #e6e8f0;
-      --muted: #a7b0c2;
-      --brand-1: #6ea8fe;
-      --brand-2: #a16eff;
-      --accent: #00e7d4;
-      --card-shadow: 0 10px 30px rgba(0,0,0,.25);
-      --radius: 16px;
-      --transition: 220ms cubic-bezier(.2,.8,.2,1);
-    }
-    /* Light theme */
-    html.light {
-      --bg: #fbfbfe;
-      --bg-soft: #f4f6ff;
-      --surface: #ffffff;
-      --text: #111322;
-      --muted: #5b6476;
-      --brand-1: #3b82f6;
-      --brand-2: #8b5cf6;
-      --accent: #06b6d4;
-      --card-shadow: 0 10px 24px rgba(0,0,0,.08);
-    }
-
-    * { box-sizing: border-box; }
-    html, body { height: 100%; }
-    body {
-      margin: 0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji";
-      color: var(--text);
-      background: radial-gradient(1200px 600px at 10% -10%, rgba(110,168,254,.25), transparent 60%),
-                  radial-gradient(900px 500px at 100% 10%, rgba(161,110,255,.20), transparent 60%),
-                  radial-gradient(700px 400px at 0% 100%, rgba(0,231,212,.10), transparent 60%),
-                  var(--bg);
-      line-height: 1.6;
-    }
-
-    header.hero {
-      padding: clamp(24px, 6vw, 64px) clamp(16px, 5vw, 48px);
-      background: linear-gradient(120deg, rgba(110,168,254,.22), rgba(161,110,255,.18));
-      border-bottom: 1px solid rgba(255,255,255,.08);
-      position: sticky; top: 0; backdrop-filter: blur(8px);
-      z-index: 50;
-    }
-    .container { width: min(1100px, 92vw); margin: 0 auto; }
-    nav { display: flex; gap: 18px; align-items: center; justify-content: space-between; }
-    .brand { display: flex; align-items: center; gap: 12px; font-weight: 800; letter-spacing: .3px; }
-    .brand svg { width: 28px; height: 28px; }
-    .nav-links a { color: var(--text); opacity: .9; text-decoration: none; padding: 8px 12px; border-radius: 12px; }
-    .nav-links a:hover { background: rgba(255,255,255,.08); }
-
-    .toolbar { display:flex; align-items:center; gap:12px; }
-    .chip { font-size: .85rem; color: var(--text); opacity:.9; padding: 6px 10px; border-radius: 999px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.1); }
-    .btn { cursor:pointer; padding: 8px 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,.12); background: var(--surface); color: var(--text); box-shadow: var(--card-shadow); transition: transform var(--transition), background var(--transition); }
-    .btn:hover { transform: translateY(-1px); }
-
-    .grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
-    @media (min-width: 840px) { .grid { grid-template-columns: 2fr 1fr; } }
-
-    main { padding: 24px 16px 80px; }
-
-    .card { background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03)); border: 1px solid rgba(255,255,255,.12); border-radius: var(--radius); box-shadow: var(--card-shadow); overflow: clip; }
-    .card .content { padding: clamp(18px, 3vw, 28px); }
-
-    h1 { font-size: clamp(1.6rem, 2.4vw, 2.2rem); margin: 0; }
-    h2 { font-size: clamp(1.35rem, 2vw, 1.5rem); margin: 0 0 8px; }
-    h3 { font-size: 1rem; margin: 0 0 6px; opacity: .9; }
-
-    .meta { color: var(--muted); font-size: .92rem; display:flex; gap:12px; flex-wrap: wrap; }
-    .meta .dot { opacity:.5; }
-
-    .post article p { margin: 14px 0; }
-    .post .tags { display:flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
-    .tag { font-size: .8rem; background: rgba(110,168,254,.15); border: 1px solid rgba(110,168,254,.35); color: var(--text); padding: 4px 8px; border-radius: 999px; }
-
-    .info-grid { display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; }
-    @media (min-width: 560px) { .info-grid { grid-template-columns: repeat(3, minmax(0,1fr)); } }
-    .stat { background: var(--surface); border: 1px dashed rgba(255,255,255,.16); border-radius: 14px; padding: 14px; display:flex; flex-direction:column; gap:6px; }
-    .stat .label { color: var(--muted); font-size:.8rem; }
-    .stat .value { font-size: 1.05rem; font-weight: 700; }
-
-    .list { display:flex; flex-direction:column; gap: 12px; margin-top: 12px; }
-    .list-item { display:flex; align-items:center; justify-content:space-between; gap: 12px; padding: 12px; border-radius: 12px; background: var(--bg-soft); border:1px solid rgba(255,255,255,.12); }
-    .list-item a { color: var(--brand-1); text-decoration: none; font-weight: 600; }
-
-    footer { padding: 40px 16px; text-align:center; color: var(--muted); }
-    .footer-inner { width:min(1100px, 92vw); margin: 0 auto; }
-
-    .pill { display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border-radius:999px; background: linear-gradient(90deg, rgba(110,168,254,.18), rgba(161,110,255,.18)); border:1px solid rgba(255,255,255,.14); }
-
-    .kbd { font-family: ui-monospace, Menlo, Monaco, Consolas, "Liberation Mono", monospace; border:1px solid rgba(255,255,255,.2); background: rgba(255,255,255,.06); padding: 2px 6px; border-radius: 6px; }
-
-    /* Floating scroll-to-top */
-    #toTop { position: fixed; right: 18px; bottom: 18px; opacity: 0; pointer-events: none; }
-    #toTop.show { opacity: 1; pointer-events: auto; }
-
-    /* Simple entrance animation */
-    @keyframes floatIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-    .card, .list-item, .stat { animation: floatIn .5s var(--transition) both; }
-      
-    /* About / Resume section */
-    .about-grid { display: grid; grid-template-columns: 1fr; gap: 18px; }
-    @media (min-width: 840px) { .about-grid { grid-template-columns: 1.1fr 1.9fr; } }
-    .about-left, .about-right { background: transparent; }
-    .contact, .about-right ul { margin: 8px 0 0; padding-left: 18px; }
-    .contact li, .about-right li { margin: 6px 0; }
-    .about-right ul li strong { font-weight: 700; }
-    .about .meta { margin-top: 6px; }
+    body { font-family: Arial, sans-serif; margin:0; padding:20px; background:#f5f7fa; }
+    header { text-align:center; margin-bottom:40px; }
+    #clock { color:#555; }
+    section { max-width:800px; margin:0 auto 40px; }
+    .repo { padding:8px 0; border-bottom:1px solid #ddd; }
+    .repo a { text-decoration:none; color:#0366d6; }
   </style>
 </head>
 <body>
-  <header class="hero">
-    <div class="container">
-      <nav>
-        <div class="brand" aria-label="Site logo and name">
-          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <path d="M12 2l2.39 4.84 5.34.78-3.86 3.76.91 5.32L12 14.77 6.22 16.7l.91-5.32L3.27 7.62l5.34-.78L12 2z" stroke="currentColor" stroke-width="1.2"/>
-          </svg>
-          <span>My Personal Blog</span>
-        </div>
-        <div class="toolbar">
-          <span id="greeting" class="chip" aria-live="polite">Hello!</span>
-          <button id="themeToggle" class="btn" aria-label="Toggle theme">🌙</button>
-        </div>
-      </nav>
-    </div>
+  <header>
+    <h1>DevOps Cloud Engineer Blog</h1>
+    <div id="clock"></div>
   </header>
-
-  <main class="container">
-    <div class="grid">
-      <!-- Left: Blog content -->
-      <section class="card post">
-        <div class="content">
-          <h1>Welcome to My Blog</h1>
-          <p class="meta">
-            <span>Hosted on <strong>Azure Functions</strong></span>
-            <span class="dot">•</span>
-            <span><span id="liveClock" aria-live="polite">--:--:--</span> (<span id="tzName"></span>)</span>
-            <span class="dot">•</span>
-            <span id="readTime">Reading time: —</span>
-          </p>
-
-          <article id="firstPost" aria-labelledby="firstPostTitle">
-            <h2 id="firstPostTitle">First Post</h2>
-            <p>This is a sample post for my personal blog hosted on Azure Functions. It now has a live clock, theme toggle, and a few 
-               real-time goodies like online status and battery info. You can also fetch the latest public repos from GitHub to show 
-               what you’ve been hacking on recently.</p>
-            <p>All of this lives in a <em>single</em> <code class="kbd">index.html</code> file—no build tools or CDNs required. Tweak colors, add posts, and deploy.
-               Azure Functions can simply return this HTML for your route, or you can host it as a static site elsewhere.</p>
-            <div class="tags">
-              <span class="tag">#azure</span>
-              <span class="tag">#blog</span>
-              <span class="tag">#vanillajs</span>
-              <span class="tag">#singlefile</span>
-            </div>
-            <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;">
-              <button id="shareBtn" class="btn">Share this post</button>
-              <button id="copyLink" class="btn">Copy link</button>
-            </div>
-          </article>
-        </div>
-      </section>
-
-      <!-- About section injected -->
-      <section class="card about" id="about">
-        <div class="content">
-          <h2>Personal Details for Cloud and DevOps Engineer</h2>
-          <p class="meta">Updated <span id="aboutUpdated"></span></p>
-          <div class="about-grid" style="margin-top:10px;">
-            <div class="about-left">
-              <h3>Name</h3>
-              <p><strong>John Doe</strong></p>
-
-              <h3>Contact Information</h3>
-              <ul class="contact">
-                <li>Email: <a href="mailto:john.doe@example.com">john.doe@example.com</a></li>
-                <li>Phone: <a href="tel:+15551234567">+1 (555) 123-4567</a></li>
-                <li>LinkedIn: <a href="https://linkedin.com/in/johndoe" target="_blank" rel="noreferrer noopener">linkedin.com/in/johndoe</a></li>
-                <li>GitHub: <a href="https://github.com/johndoe" target="_blank" rel="noreferrer noopener">github.com/johndoe</a></li>
-              </ul>
-
-              <h3 style="margin-top:12px;">Location</h3>
-              <p>San Francisco, CA, USA</p>
-
-              <h3>Availability</h3>
-              <p>Available for full-time, contract, or remote opportunities starting immediately.</p>
-            </div>
-
-            <div class="about-right">
-              <h3>Professional Summary</h3>
-              <p>Highly skilled Cloud and DevOps Engineer with over 5 years of experience in designing, deploying, and managing scalable cloud infrastructure and CI/CD pipelines. Proficient in AWS, Azure, Docker, Kubernetes, and Terraform, with a strong focus on automation, infrastructure as code, and optimizing system performance. Adept at collaborating with cross-functional teams to deliver secure and reliable solutions.</p>
-
-              <h3>Key Skills</h3>
-              <ul>
-                <li><strong>Cloud Platforms:</strong> AWS (EC2, S3, Lambda, RDS), Azure, Google Cloud Platform</li>
-                <li><strong>Containerization & Orchestration:</strong> Docker, Kubernetes, ECS</li>
-                <li><strong>Infrastructure as Code:</strong> Terraform, CloudFormation, Ansible</li>
-                <li><strong>CI/CD Tools:</strong> Jenkins, GitLab CI, GitHub Actions</li>
-                <li><strong>Scripting & Programming:</strong> Python, Bash, PowerShell</li>
-                <li><strong>Monitoring & Logging:</strong> Prometheus, Grafana, ELK Stack, CloudWatch</li>
-                <li><strong>Version Control:</strong> Git</li>
-                <li><strong>Networking & Security:</strong> VPC, IAM, Firewalls, SSL/TLS</li>
-                <li><strong>Operating Systems:</strong> Linux (Ubuntu, CentOS), Windows Server</li>
-              </ul>
-
-              <h3>Certifications</h3>
-              <ul>
-                <li>AWS Certified Solutions Architect – Associate</li>
-                <li>Microsoft Certified: Azure Administrator Associate</li>
-                <li>Certified Kubernetes Administrator (CKA)</li>
-                <li>HashiCorp Certified: Terraform Associate</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Right: Live details and feeds -->
-      <aside class="card">
-        <div class="content">
-          <h2>Live details</h2>
-          <div class="info-grid" style="margin-top:10px;">
-            <div class="stat"><span class="label">Your time</span><span class="value" id="timeStat">--:--</span></div>
-            <div class="stat"><span class="label">Status</span><span class="value" id="onlineStat">Checking…</span></div>
-            <div class="stat"><span class="label">Battery</span><span class="value" id="batteryStat">—</span></div>
-            <div class="stat"><span class="label">Viewport</span><span class="value" id="viewportStat">—×—</span></div>
-            <div class="stat"><span class="label">Theme</span><span class="value" id="themeStat">—</span></div>
-            <div class="stat"><span class="label">Uptime</span><span class="value" id="uptimeStat">0s</span></div>
-          </div>
-
-          <div style="margin-top:18px;">
-            <div class="pill">🔧 Tip: Press <span class="kbd">T</span> to toggle theme</div>
-          </div>
-
-          <div style="margin-top:22px;">
-            <h3>Latest on GitHub</h3>
-            <p class="meta">Public repos updated recently for <strong id="ghUserLabel">octocat</strong>:</p>
-            <div id="ghList" class="list" role="list" aria-busy="true"></div>
-          </div>
-        </div>
-      </aside>
-    </div>
-  </main>
-
-  <footer>
-    <div class="footer-inner">
-      <p>© <span id="year"></span> My Blog · Built with ❤ · <a href="#" style="color:var(--brand-1); text-decoration:none;">Back to top</a></p>
-    </div>
-  </footer>
-
-  <button id="toTop" class="btn" aria-label="Scroll to top">↑</button>
-
+  <section>
+    <h2>About Me</h2>
+    <p>Hi, I'm a DevOps and cloud engineer sharing tips on automation and infrastructure.</p>
+  </section>
+  <section>
+    <h2>Latest GitHub Repositories</h2>
+    <div id="repos">Loading...</div>
+  </section>
   <script>
-    // ==== Configuration (edit safely) ======================================
-    const GITHUB_USERNAME = "octocat"; // ← change to your GitHub username
-    const GITHUB_REPO_COUNT = 6;        // how many repos to show
-
-    // ==== Theme handling ====================================================
-    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme) document.documentElement.classList.toggle('light', savedTheme === 'light');
-    else document.documentElement.classList.toggle('light', !prefersDark);
-
-    function applyThemeLabel() {
-      const isLight = document.documentElement.classList.contains('light');
-      document.getElementById('themeToggle').textContent = isLight ? '🌙' : '☀️';
-      document.getElementById('themeStat').textContent = isLight ? 'Light' : 'Dark';
-    }
-
-    document.getElementById('themeToggle').addEventListener('click', () => {
-      document.documentElement.classList.toggle('light');
-      const isLight = document.documentElement.classList.contains('light');
-      localStorage.setItem('theme', isLight ? 'light' : 'dark');
-      applyThemeLabel();
-    });
-
-    window.addEventListener('keydown', (e) => {
-      if (e.key.toLowerCase() === 't') document.getElementById('themeToggle').click();
-    });
-
-    // ==== Greeting + time ===================================================
-    function greetingForHour(h) {
-      if (h < 5) return 'Up late?';
-      if (h < 12) return 'Good morning';
-      if (h < 17) return 'Good afternoon';
-      if (h < 21) return 'Good evening';
-      return 'Good night';
-    }
-
-    const tzFormatter = Intl.DateTimeFormat([], { timeZoneName: 'short' });
-    const tzName = tzFormatter.formatToParts(new Date()).find(p => p.type === 'timeZoneName')?.value ?? '';
-    document.getElementById('tzName').textContent = tzName;
-
     function updateClock() {
-      const now = new Date();
-      const time = now.toLocaleTimeString([], { hour12: false });
-      document.getElementById('liveClock').textContent = time;
-      document.getElementById('timeStat').textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      document.getElementById('greeting').textContent = greetingForHour(now.getHours());
+      document.getElementById('clock').textContent = new Date().toLocaleString();
     }
-    setInterval(updateClock, 1000); updateClock();
+    setInterval(updateClock, 1000);
+    updateClock();
 
-    // ==== Reading time ======================================================
-    function estimateReadingTime(el) {
-      const text = el.innerText || el.textContent || '';
-      const words = (text.trim().match(/\b\w+\b/g) || []).length;
-      const minutes = Math.max(1, Math.round(words / 225));
-      return `${minutes} min read`;
-    }
-    document.getElementById('readTime').textContent = `Reading time: ${estimateReadingTime(document.getElementById('firstPost'))}`;
-
-    // ==== Online/offline + viewport + uptime ===============================
-    const onlineStat = document.getElementById('onlineStat');
-    function setOnlineStatus() { onlineStat.textContent = navigator.onLine ? 'Online' : 'Offline'; }
-    window.addEventListener('online', setOnlineStatus);
-    window.addEventListener('offline', setOnlineStatus);
-    setOnlineStatus();
-
-    const viewportStat = document.getElementById('viewportStat');
-    function setViewportStat() { viewportStat.textContent = `${window.innerWidth}×${window.innerHeight}`; }
-    window.addEventListener('resize', setViewportStat);
-    setViewportStat();
-
-    let start = performance.now();
-    const uptimeStat = document.getElementById('uptimeStat');
-    setInterval(() => {
-      const s = Math.floor((performance.now() - start) / 1000);
-      const m = Math.floor(s / 60), r = s % 60;
-      uptimeStat.textContent = m ? `${m}m ${r}s` : `${r}s`;
-    }, 1000);
-
-    // ==== Battery ===========================================================
-    const batteryStat = document.getElementById('batteryStat');
-    if (navigator.getBattery) {
-      navigator.getBattery().then(b => {
-        function updateBattery() {
-          const pct = Math.round(b.level * 100);
-          batteryStat.textContent = `${pct}% ${b.charging ? '⚡' : ''}`.trim();
-        }
-        ['levelchange','chargingchange'].forEach(ev => b.addEventListener(ev, updateBattery));
-        updateBattery();
-      }).catch(() => batteryStat.textContent = 'Unavailable');
-    } else {
-      batteryStat.textContent = 'Unsupported';
-    }
-
-    // ==== GitHub feed =======================================================
-    const ghList = document.getElementById('ghList');
-    document.getElementById('ghUserLabel').textContent = GITHUB_USERNAME;
-    async function loadRepos() {
-      ghList.innerHTML = '<div class="list-item" role="listitem">Loading…</div>';
-      try {
-        const res = await fetch(`https://api.github.com/users/${encodeURIComponent(GITHUB_USERNAME)}/repos?sort=updated&per_page=${GITHUB_REPO_COUNT}`);
-        if (!res.ok) throw new Error(`GitHub API: ${res.status}`);
-        const repos = await res.json();
-        ghList.setAttribute('aria-busy', 'false');
-        ghList.innerHTML = '';
-        repos.forEach(r => {
-          const item = document.createElement('div');
-          item.className = 'list-item';
-          item.setAttribute('role','listitem');
-          const a = document.createElement('a');
-          a.href = r.html_url; a.target = '_blank'; a.rel = 'noreferrer noopener';
-          a.textContent = r.name;
-          const meta = document.createElement('span');
-          meta.className = 'meta';
-          const updated = new Date(r.updated_at).toLocaleString();
-          meta.textContent = `Updated ${updated}`;
-          item.appendChild(a); item.appendChild(meta);
-          ghList.appendChild(item);
+    const USER = 'your-github-username';
+    fetch(`https://api.github.com/users/${USER}/repos?sort=updated&per_page=5`)
+      .then(r => r.json())
+      .then(data => {
+        const container = document.getElementById('repos');
+        container.innerHTML = '';
+        data.forEach(repo => {
+          const div = document.createElement('div');
+          div.className = 'repo';
+          div.innerHTML = `<a href="${repo.html_url}" target="_blank">${repo.name}</a>` +
+            ` <span style="color:#666;font-size:0.9em">(updated ${new Date(repo.updated_at).toLocaleDateString()})</span>`;
+          container.appendChild(div);
         });
-        if (repos.length === 0) {
-          ghList.innerHTML = '<div class="list-item" role="listitem">No public repos found.</div>';
-        }
-      } catch (err) {
-        ghList.innerHTML = `<div class="list-item" role="listitem">Failed to load repos. ${err.message}</div>`;
-      }
-    }
-    loadRepos();
-
-    // ==== Share / copy ======================================================
-    const shareBtn = document.getElementById('shareBtn');
-    const copyBtn = document.getElementById('copyLink');
-    shareBtn.addEventListener('click', async () => {
-      const shareData = { title: document.title, text: 'Check out this post!', url: location.href };
-      if (navigator.share) {
-        try { await navigator.share(shareData); } catch {}
-      } else {
-        try {
-          await navigator.clipboard.writeText(location.href);
-          shareBtn.textContent = 'Link copied!';
-          setTimeout(() => shareBtn.textContent = 'Share this post', 1500);
-        } catch {}
-      }
-    });
-    copyBtn.addEventListener('click', async () => {
-      try {
-        await navigator.clipboard.writeText(location.href);
-        copyBtn.textContent = 'Copied!';
-        setTimeout(() => copyBtn.textContent = 'Copy link', 1500);
-      } catch {}
-    });
-
-    // ==== Footer year =======================================================
-    document.getElementById('year').textContent = new Date().getFullYear();
-
-    // ==== About updated timestamp
-    const aboutUpdatedEl = document.getElementById('aboutUpdated');
-    if (aboutUpdatedEl) { aboutUpdatedEl.textContent = new Date().toLocaleString(); }
-
-    // ==== Scroll to top =====================================================
-    const toTop = document.getElementById('toTop');
-    window.addEventListener('scroll', () => {
-      toTop.classList.toggle('show', window.scrollY > 300);
-    });
-    toTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
-
-    // Set theme label on first paint
-    applyThemeLabel();
+      })
+      .catch(() => document.getElementById('repos').textContent = 'Failed to load repositories.');
   </script>
 </body>
 </html>

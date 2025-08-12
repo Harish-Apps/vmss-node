@@ -1,44 +1,38 @@
-# Personal Blog on Azure Functions
+# DevOps Cloud Engineer Blog on Azure Functions
 
-This project hosts a simple personal blog written in HTML and CSS and served through an Azure Function. Deployment is automated via GitHub Actions using the Azure Functions Core Tools.
+This repository contains a minimal personal blog for a DevOps/cloud engineer. The site is a single `index.html` page served through an Azure Function and shows the current time and the latest public GitHub repositories.
 
 ## Infrastructure Setup
 
-Use the provided script to create the required Azure resources:
+Provision the required Azure resources using the provided script:
 
 ```bash
 ./azure-setup.sh
 ```
 
-This script runs:
-
-```bash
-az group create --name functionRG --location centralindia
-az storage account create --name dhaappsaznefunc --location centralindia --resource-group functionRG --sku Standard_LRS
-az functionapp create --resource-group functionRG --consumption-plan-location centralindia --runtime python --runtime-version 3.10 --functions-version 4 --name dhaappsaznewf --os-type linux --storage-account dhaappsaznefunc
-```
+The script creates a resource group, storage account and a Python Azure Function App in *Central India*.
 
 ## Local Development
 
 1. Install [Azure Functions Core Tools](https://learn.microsoft.com/azure/azure-functions/functions-run-local).
-2. Run the function locally:
+2. Start the function:
 
 ```bash
 func start
 ```
 
-Visit `http://localhost:7071` to view the blog.
+Browse to `http://localhost:7071` to view the blog.
 
 ## CI/CD
 
-A GitHub Actions workflow (`.github/workflows/deploy.yml`) publishes the function app whenever changes are pushed to the `main` branch. The workflow requires a service principal stored in the repository secret `AZURE_CREDENTIALS`.
+Whenever code is pushed to the `main` branch, GitHub Actions automatically deploys the latest version to the Azure Function. The workflow uses a service principal stored in the repository secret `AZURE_CREDENTIALS`.
 
 ## Access
 
-After a successful deployment, the blog is available at:
+After a successful deployment the blog is available at:
 
 ```
 https://dhaappsaznewf.azurewebsites.net
 ```
 
-Replace the function app name in the URL if you create a different one.
+Replace the function app name in the URL if you created a different one.
