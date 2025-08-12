@@ -107,6 +107,15 @@
     /* Simple entrance animation */
     @keyframes floatIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
     .card, .list-item, .stat { animation: floatIn .5s var(--transition) both; }
+      
+    /* About / Resume section */
+    .about-grid { display: grid; grid-template-columns: 1fr; gap: 18px; }
+    @media (min-width: 840px) { .about-grid { grid-template-columns: 1.1fr 1.9fr; } }
+    .about-left, .about-right { background: transparent; }
+    .contact, .about-right ul { margin: 8px 0 0; padding-left: 18px; }
+    .contact li, .about-right li { margin: 6px 0; }
+    .about-right ul li strong { font-weight: 700; }
+    .about .meta { margin-top: 6px; }
   </style>
 </head>
 <body>
@@ -159,6 +168,60 @@
               <button id="copyLink" class="btn">Copy link</button>
             </div>
           </article>
+        </div>
+      </section>
+
+      <!-- About section injected -->
+      <section class="card about" id="about">
+        <div class="content">
+          <h2>Personal Details for Cloud and DevOps Engineer</h2>
+          <p class="meta">Updated <span id="aboutUpdated"></span></p>
+          <div class="about-grid" style="margin-top:10px;">
+            <div class="about-left">
+              <h3>Name</h3>
+              <p><strong>John Doe</strong></p>
+
+              <h3>Contact Information</h3>
+              <ul class="contact">
+                <li>Email: <a href="mailto:john.doe@example.com">john.doe@example.com</a></li>
+                <li>Phone: <a href="tel:+15551234567">+1 (555) 123-4567</a></li>
+                <li>LinkedIn: <a href="https://linkedin.com/in/johndoe" target="_blank" rel="noreferrer noopener">linkedin.com/in/johndoe</a></li>
+                <li>GitHub: <a href="https://github.com/johndoe" target="_blank" rel="noreferrer noopener">github.com/johndoe</a></li>
+              </ul>
+
+              <h3 style="margin-top:12px;">Location</h3>
+              <p>San Francisco, CA, USA</p>
+
+              <h3>Availability</h3>
+              <p>Available for full-time, contract, or remote opportunities starting immediately.</p>
+            </div>
+
+            <div class="about-right">
+              <h3>Professional Summary</h3>
+              <p>Highly skilled Cloud and DevOps Engineer with over 5 years of experience in designing, deploying, and managing scalable cloud infrastructure and CI/CD pipelines. Proficient in AWS, Azure, Docker, Kubernetes, and Terraform, with a strong focus on automation, infrastructure as code, and optimizing system performance. Adept at collaborating with cross-functional teams to deliver secure and reliable solutions.</p>
+
+              <h3>Key Skills</h3>
+              <ul>
+                <li><strong>Cloud Platforms:</strong> AWS (EC2, S3, Lambda, RDS), Azure, Google Cloud Platform</li>
+                <li><strong>Containerization & Orchestration:</strong> Docker, Kubernetes, ECS</li>
+                <li><strong>Infrastructure as Code:</strong> Terraform, CloudFormation, Ansible</li>
+                <li><strong>CI/CD Tools:</strong> Jenkins, GitLab CI, GitHub Actions</li>
+                <li><strong>Scripting & Programming:</strong> Python, Bash, PowerShell</li>
+                <li><strong>Monitoring & Logging:</strong> Prometheus, Grafana, ELK Stack, CloudWatch</li>
+                <li><strong>Version Control:</strong> Git</li>
+                <li><strong>Networking & Security:</strong> VPC, IAM, Firewalls, SSL/TLS</li>
+                <li><strong>Operating Systems:</strong> Linux (Ubuntu, CentOS), Windows Server</li>
+              </ul>
+
+              <h3>Certifications</h3>
+              <ul>
+                <li>AWS Certified Solutions Architect – Associate</li>
+                <li>Microsoft Certified: Azure Administrator Associate</li>
+                <li>Certified Kubernetes Administrator (CKA)</li>
+                <li>HashiCorp Certified: Terraform Associate</li>
+              </ul>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -350,6 +413,10 @@
 
     // ==== Footer year =======================================================
     document.getElementById('year').textContent = new Date().getFullYear();
+
+    // ==== About updated timestamp
+    const aboutUpdatedEl = document.getElementById('aboutUpdated');
+    if (aboutUpdatedEl) { aboutUpdatedEl.textContent = new Date().toLocaleString(); }
 
     // ==== Scroll to top =====================================================
     const toTop = document.getElementById('toTop');
