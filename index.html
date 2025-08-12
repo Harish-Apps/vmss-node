@@ -3,51 +3,365 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>DevOps Cloud Engineer Blog</title>
+  <title>Harish • DevOps & Cloud Engineer</title>
+  <meta name="description" content="Personal blog of a DevOps & Cloud Engineer – notes on automation, Kubernetes, Azure, AWS, and career tips." />
+  <meta property="og:title" content="Harish • DevOps & Cloud Engineer" />
+  <meta property="og:description" content="Notes on automation, Kubernetes, Azure, AWS, and career tips." />
+  <meta property="og:type" content="website" />
+  <meta name="theme-color" content="#0ea5e9" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='80'>🚀</text></svg>">
   <style>
-    body { font-family: Arial, sans-serif; margin:0; padding:20px; background:#f5f7fa; }
-    header { text-align:center; margin-bottom:40px; }
-    #clock { color:#555; }
-    section { max-width:800px; margin:0 auto 40px; }
-    .repo { padding:8px 0; border-bottom:1px solid #ddd; }
-    .repo a { text-decoration:none; color:#0366d6; }
+    :root{
+      --bg: #0b1220;
+      --panel:#101827;
+      --text:#e5e7eb;
+      --muted:#9ca3af;
+      --brand:#38bdf8; /* sky-400 */
+      --brand-2:#22d3ee; /* cyan-400 */
+      --accent:#22c55e; /* green-500 */
+      --danger:#ef4444;
+      --card:#0f172a;
+      --ring: rgba(56,189,248,.4);
+      --shadow: 0 10px 30px rgba(2,8,23,.35);
+    }
+    :root.light{
+      --bg:#f5f7fa;
+      --panel:#ffffff;
+      --text:#0f172a;
+      --muted:#475569;
+      --brand:#0284c7;
+      --brand-2:#06b6d4;
+      --card:#ffffff;
+      --ring: rgba(56,189,248,.5);
+      --shadow: 0 8px 24px rgba(2,8,23,.08);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+      background: radial-gradient(1200px 800px at 20% -10%, rgba(56,189,248,.15), transparent 60%),
+                  radial-gradient(1000px 700px at 120% 10%, rgba(34,211,238,.12), transparent 60%),
+                  var(--bg);
+      color:var(--text);
+      line-height:1.6;
+    }
+    a{color:var(--brand); text-decoration:none}
+    a:hover{text-decoration:underline}
+    .container{max-width:1100px; margin:0 auto; padding:24px}
+    header.site{
+      position:sticky; top:0; z-index:50; backdrop-filter:saturate(140%) blur(10px);
+      background:color-mix(in oklab, var(--bg) 70%, transparent); border-bottom:1px solid rgba(148,163,184,.15);
+    }
+    .nav{display:flex; align-items:center; justify-content:space-between; gap:16px; padding:14px 24px}
+    .brand{display:flex; align-items:center; gap:12px; font-weight:800; letter-spacing:.3px}
+    .logo{
+      width:38px; height:38px; display:grid; place-items:center; border-radius:12px; color:#0b1220;
+      background: conic-gradient(from 180deg at 50% 50%, var(--brand), var(--brand-2));
+      box-shadow: var(--shadow);
+      font-weight:900;
+    }
+    .nav a{font-weight:600; opacity:.9}
+    .nav-links{display:flex; gap:18px; align-items:center}
+    .btn{display:inline-flex; align-items:center; gap:8px; padding:10px 14px; border-radius:12px; border:1px solid rgba(148,163,184,.25); background:var(--panel); color:var(--text); box-shadow:var(--shadow)}
+    .btn:hover{transform:translateY(-1px)}
+    .btn.ghost{background:transparent}
+    .btn.primary{background:linear-gradient(90deg,var(--brand),var(--brand-2)); color:#00131a; border-color:transparent; font-weight:800}
+
+    /* Hero */
+    .hero{display:grid; grid-template-columns:1.1fr .9fr; gap:28px; padding:48px 24px 8px}
+    @media (max-width: 900px){ .hero{grid-template-columns:1fr; padding-top:28px}}
+    .card{background:linear-gradient(180deg, color-mix(in oklab, var(--panel) 92%, transparent), color-mix(in oklab, var(--card) 100%, transparent)); border:1px solid rgba(148,163,184,.15); border-radius:18px; box-shadow:var(--shadow)}
+    .hero .left{padding:28px}
+    .kicker{display:inline-block; padding:6px 10px; border-radius:999px; background:rgba(56,189,248,.12); color:var(--brand); font-weight:700; border:1px solid var(--ring)}
+    h1{font-size: clamp(28px, 4vw, 44px); line-height:1.15; margin:14px 0 10px}
+    .sub{font-size: clamp(16px, 2.4vw, 18px); color:var(--muted)}
+    .hero-cta{margin-top:18px; display:flex; flex-wrap:wrap; gap:10px}
+    .meta{display:flex; gap:16px; align-items:center; margin-top:16px; color:var(--muted)}
+    .dot{width:6px; height:6px; background:var(--brand); border-radius:999px; box-shadow:0 0 0 4px var(--ring)}
+
+    .clock{
+      display:flex; flex-direction:column; gap:6px; padding:22px; border-left:3px solid var(--brand); border-radius:14px; background:linear-gradient(180deg, rgba(56,189,248,.08), transparent);
+    }
+    .clock h3{margin:0; font-size:16px; color:var(--muted)}
+    .clock .time{font-size:28px; font-weight:800}
+
+    .avatar-card{display:flex; flex-direction:column; gap:16px; padding:24px; align-items:center}
+    .avatar{
+      width:120px; height:120px; border-radius:50%; display:grid; place-items:center; font-size:46px; font-weight:900; color:#06121a;
+      background: radial-gradient(120px 120px at 30% 30%, #fff 0%, #dff7ff 70%, #b5f3ff 100%);
+      border:3px solid var(--ring); box-shadow: var(--shadow);
+    }
+    .social{display:flex; gap:10px; flex-wrap:wrap}
+    .chip{padding:6px 10px; border-radius:999px; border:1px solid rgba(148,163,184,.25); background:color-mix(in oklab, var(--panel) 95%, transparent); font-size:12px}
+
+    /* Sections */
+    section{padding:28px 24px;}
+    .section-title{display:flex; align-items:center; gap:10px; font-size:20px}
+
+    .grid{display:grid; grid-template-columns:repeat(12,1fr); gap:18px}
+    .span-6{grid-column: span 6}
+    .span-4{grid-column: span 4}
+    .span-3{grid-column: span 3}
+    @media (max-width: 900px){ .span-6, .span-4, .span-3{grid-column: span 12} }
+
+    /* Cards */
+    .repo, .post, .exp, .skill, .contact-card{padding:18px; border-radius:16px; border:1px solid rgba(148,163,184,.15); background:var(--card)}
+    .repo h4,.post h4{margin:0 0 6px}
+    .muted{color:var(--muted)}
+    .pill{display:inline-flex; align-items:center; gap:6px; font-size:12px; padding:4px 8px; border-radius:999px; border:1px solid rgba(148,163,184,.18)}
+
+    /* Footer */
+    footer{padding:28px 24px 60px; text-align:center; color:var(--muted)}
+
+    /* Back to top */
+    #toTop{position:fixed; right:16px; bottom:16px; opacity:0; transform:translateY(12px); transition:.25s;}
+    #toTop.show{opacity:1; transform:translateY(0)}
+
+    /* Code style */
+    pre{background: #0a0f1d; color:#e5e7eb; padding:14px; border-radius:12px; overflow:auto; border:1px solid rgba(148,163,184,.18)}
+
+    /* Theme toggle */
+    .toggle{cursor:pointer}
   </style>
 </head>
 <body>
-  <header>
-    <h1>DevOps Cloud Engineer Blogs</h1>
-    <div id="clock"></div>
+  <header class="site">
+    <nav class="nav container">
+      <div class="brand">
+        <div class="logo">HC</div>
+        <div>
+          <div style="font-weight:900">Harish • Cloud & DevOps</div>
+          <small class="muted">Automation • Kubernetes • Azure • AWS</small>
+        </div>
+      </div>
+      <div class="nav-links">
+        <a href="#about">About</a>
+        <a href="#repos">Projects</a>
+        <a href="#posts">Blog</a>
+        <a href="#skills">Skills</a>
+        <a href="#contact">Contact</a>
+        <button id="themeBtn" class="btn ghost toggle" aria-label="Toggle theme">🌓</button>
+        <a class="btn primary" href="#contact">Hire Me</a>
+      </div>
+    </nav>
   </header>
-  <section>
-    <h2>About Me</h2>
-    <p>Hi, I'm a DevOps and cloud engineer sharing tips on automation and infrastructure.</p>
-  </section>
-  <section>
-    <h2>Latest GitHub Repositories</h2>
-    <div id="repos">Loading...</div>
-  </section>
-  <script>
-    function updateClock() {
-      document.getElementById('clock').textContent = new Date().toLocaleString();
-    }
-    setInterval(updateClock, 1000);
-    updateClock();
 
-    const USER = 'your-github-username';
-    fetch(`https://api.github.com/users/${USER}/repos?sort=updated&per_page=5`)
+  <!-- Hero -->
+  <div class="hero container">
+    <div class="left card">
+      <span class="kicker">DevOps Cloud Engineer</span>
+      <h1>Ship faster with reliable, secure automation.</h1>
+      <p class="sub">I design scalable cloud platforms and CI/CD systems on Azure & AWS, with a focus on Kubernetes, IaC, and observability. This is my personal blog where I share guides, templates, and hard‑won lessons from prod.</p>
+      <div class="hero-cta">
+        <a class="btn" href="#posts">Read Blog</a>
+        <a class="btn ghost" href="#repos">View Projects →</a>
+      </div>
+      <div class="meta">
+        <span class="pill"><span class="dot"></span> Open to consulting</span>
+        <span class="pill">Based in 🇮🇳 India</span>
+        <span class="pill">IST time below</span>
+      </div>
+      <div class="clock" style="margin-top:14px">
+        <h3>Current time (Asia/Kolkata)</h3>
+        <div class="time" id="clock"></div>
+        <div class="muted" id="greet"></div>
+      </div>
+    </div>
+    <aside class="card avatar-card">
+      <div class="avatar" aria-hidden="true">H</div>
+      <div style="text-align:center">
+        <div style="font-weight:800; font-size:18px">Harish Appana</div>
+        <div class="muted">Cloud & DevOps Engineer</div>
+      </div>
+      <div class="social">
+        <a class="pill" href="mailto:harish@example.com" title="Email">✉️ Email</a>
+        <a class="pill" href="https://www.linkedin.com/" target="_blank" rel="noopener">💼 LinkedIn</a>
+        <a class="pill" href="https://github.com/your-github-username" target="_blank" rel="noopener">🐙 GitHub</a>
+        <a class="pill" href="#contact">📅 Book a call</a>
+      </div>
+      <div class="muted" style="text-align:center">Certs: AZ-104 • CKA • AWS SAA</div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:center">
+        <span class="chip">Kubernetes</span>
+        <span class="chip">Terraform</span>
+        <span class="chip">Azure</span>
+        <span class="chip">AWS</span>
+        <span class="chip">GitHub Actions</span>
+        <span class="chip">Ansible</span>
+      </div>
+    </aside>
+  </div>
+
+  <!-- About -->
+  <section id="about" class="container">
+    <h2 class="section-title">About Me</h2>
+    <p>Hi! I'm a DevOps and Cloud Engineer who loves turning messy release processes into clean, repeatable automation. I build secure networks, production‑grade Kubernetes, and CI/CD pipelines that make teams move faster. On this blog I publish checklists, templates, and troubleshooting notes for future‑me (and you).</p>
+  </section>
+
+  <!-- Projects / Repos -->
+  <section class="container" aria-labelledby="projects-title">
+    <h2 id="projects-title" class="section-title">Latest GitHub Repositories</h2>
+    <div class="grid" id="reposGrid">
+      <div class="muted">Loading…</div>
+    </div>
+    <div class="muted" style="margin-top:8px">Tip: set <code>USER</code> in the script below to your GitHub username.</div>
+  </section>
+
+  <!-- Blog Posts (static examples) -->
+  <section id="posts" class="container">
+    <h2 class="section-title">Recent Posts</h2>
+    <div class="grid">
+      <article class="post span-6">
+        <h4>Zero‑Downtime Deploys on AKS with Blue‑Green</h4>
+        <p class="muted">Strategy, traffic shaping with Azure Front Door, and Helm hooks. Includes manifests.</p>
+        <a href="#" aria-label="Read Blue‑Green post">Read →</a>
+      </article>
+      <article class="post span-6">
+        <h4>Private Endpoints vs Service Endpoints—When to Use Which</h4>
+        <p class="muted">Threat model, cost, and operational trade‑offs with diagrams and a decision table.</p>
+        <a href="#" aria-label="Read PE vs SE post">Read →</a>
+      </article>
+      <article class="post span-6">
+        <h4>Kubernetes CrashLoopBackOff—Root‑Cause Checklist</h4>
+        <p class="muted">A fast, repeatable triage: events, image pulls, probes, and mounts with one‑liners.</p>
+        <a href="#" aria-label="Read CrashLoopBackOff post">Read →</a>
+      </article>
+      <article class="post span-6">
+        <h4>Monitoring Azure Databases the Practical Way</h4>
+        <p class="muted">Key metrics, diagnostic settings, KQL queries, and alert rules you can copy‑paste.</p>
+        <a href="#" aria-label="Read Azure DB monitoring post">Read →</a>
+      </article>
+    </div>
+  </section>
+
+  <!-- Skills -->
+  <section id="skills" class="container">
+    <h2 class="section-title">Skills</h2>
+    <div class="grid">
+      <div class="skill span-4">
+        <h4>Cloud</h4>
+        <p class="muted">Azure, AWS, VNet/VPC, Private Link, Front Door, ALB/NLB.</p>
+      </div>
+      <div class="skill span-4">
+        <h4>Containers</h4>
+        <p class="muted">Kubernetes, Helm, Ingress, HPA, GitOps, service mesh basics.</p>
+      </div>
+      <div class="skill span-4">
+        <h4>Automation</h4>
+        <p class="muted">Terraform, Ansible, GitHub Actions, Azure DevOps, Bash/Python.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Experience / Timeline -->
+  <section class="container">
+    <h2 class="section-title">Experience</h2>
+    <div class="grid">
+      <div class="exp span-6">
+        <strong>Cloud & DevOps Engineer</strong>
+        <div class="muted">2021 — Present</div>
+        <ul>
+          <li>Migrated high‑traffic web apps to AKS with zero downtime.</li>
+          <li>Built reusable Terraform modules, reduced infra drift by 90%.</li>
+          <li>Set up observability with Prometheus, Grafana, Azure Monitor.</li>
+        </ul>
+      </div>
+      <div class="exp span-6">
+        <strong>SRE (Contract)</strong>
+        <div class="muted">2019 — 2021</div>
+        <ul>
+          <li>Designed canary releases using Front Door + header‑based routing.</li>
+          <li>Hardened clusters with network policies and OPA Gatekeeper.</li>
+          <li>Cost‑optimized workloads saving $180k annually.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact -->
+  <section id="contact" class="container">
+    <h2 class="section-title">Get in touch</h2>
+    <div class="contact-card">
+      <p>Want help with a project, an audit of your Kubernetes setup, or a training session for your team? Drop a message—I'll reply within a day.</p>
+      <p><strong>Email:</strong> <a id="emailLink" href="mailto:harish@example.com">harish@example.com</a> <button class="btn" id="copyBtn" style="margin-left:8px">Copy</button></p>
+      <p><strong>Calendly:</strong> <a href="#" target="_blank" rel="noopener">Schedule a 30‑min intro call →</a></p>
+    </div>
+  </section>
+
+  <footer>
+    <div>© <span id="year"></span> Harish Appana • Built with vanilla HTML/CSS/JS</div>
+    <div id="lastUpdated" class="muted"></div>
+  </footer>
+
+  <button id="toTop" class="btn" aria-label="Back to top">↑ Top</button>
+
+  <script>
+    // ---------- Theme toggle ----------
+    (function(){
+      const root = document.documentElement;
+      const saved = localStorage.getItem('theme');
+      if(saved){ root.classList.toggle('light', saved === 'light'); }
+      document.getElementById('themeBtn').addEventListener('click', () => {
+        const next = root.classList.toggle('light');
+        localStorage.setItem('theme', next ? 'light' : 'dark');
+      });
+    })();
+
+    // ---------- Clock & greeting (IST) ----------
+    function updateClock(){
+      const now = new Date();
+      const ist = now.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', hour12:true });
+      document.getElementById('clock').textContent = ist;
+      const hour = Number(now.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', hour12:false }));
+      const greet = hour < 12 ? 'Good morning' : (hour < 17 ? 'Good afternoon' : 'Good evening');
+      document.getElementById('greet').textContent = greet + ' 👋';
+    }
+    updateClock();
+    setInterval(updateClock, 1000);
+
+    // ---------- Back to top button ----------
+    const toTop = document.getElementById('toTop');
+    window.addEventListener('scroll', () => {
+      if(window.scrollY > 400){ toTop.classList.add('show'); } else { toTop.classList.remove('show'); }
+    });
+    toTop.addEventListener('click', () => window.scrollTo({top:0, behavior:'smooth'}));
+
+    // ---------- Footer meta ----------
+    document.getElementById('year').textContent = new Date().getFullYear();
+    document.getElementById('lastUpdated').textContent = 'Last updated: ' + new Date(document.lastModified).toLocaleString();
+
+    // ---------- Copy email ----------
+    document.getElementById('copyBtn').addEventListener('click', async () => {
+      const email = document.getElementById('emailLink').textContent;
+      try { await navigator.clipboard.writeText(email); alert('Email copied!'); } catch(e){ alert('Copy failed'); }
+    });
+
+    // ---------- GitHub repos ----------
+    const USER = 'your-github-username'; // ← set this to your GitHub username
+    const grid = document.getElementById('reposGrid');
+    fetch(`https://api.github.com/users/${USER}/repos?sort=updated&per_page=6`)
       .then(r => r.json())
-      .then(data => {
-        const container = document.getElementById('repos');
-        container.innerHTML = '';
-        data.forEach(repo => {
+      .then(list => Array.isArray(list) ? list : [])
+      .then(repos => {
+        grid.innerHTML = '';
+        if(repos.length === 0){ grid.innerHTML = '<div class="muted">No repositories found or API rate limit reached. Try again later.</div>'; return; }
+        repos.forEach(repo => {
           const div = document.createElement('div');
-          div.className = 'repo';
-          div.innerHTML = `<a href="${repo.html_url}" target="_blank">${repo.name}</a>` +
-            ` <span style="color:#666;font-size:0.9em">(updated ${new Date(repo.updated_at).toLocaleDateString()})</span>`;
-          container.appendChild(div);
+          div.className = 'repo span-6';
+          div.innerHTML = `
+            <h4><a href="${repo.html_url}" target="_blank" rel="noopener">${repo.name}</a></h4>
+            <p class="muted">${repo.description ? repo.description.replace(/</g,'&lt;') : 'No description'} </p>
+            <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center">
+              <span class="pill">★ ${repo.stargazers_count}</span>
+              <span class="pill">⑂ ${repo.forks_count} forks</span>
+              ${repo.language ? `<span class="pill">${repo.language}</span>` : ''}
+              <span class="pill">Updated ${new Date(repo.updated_at).toLocaleDateString()}</span>
+              ${repo.homepage ? `<a class="pill" href="${repo.homepage}" target="_blank" rel="noopener">Live ↗</a>` : ''}
+            </div>
+          `;
+          grid.appendChild(div);
         });
       })
-      .catch(() => document.getElementById('repos').textContent = 'Failed to load repositories.');
+      .catch(() => { grid.innerHTML = '<div class="muted">Failed to load repositories.</div>'; });
   </script>
 </body>
 </html>
