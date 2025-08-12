@@ -2,7 +2,7 @@ name: Deploy to Azure Functions
 
 on:
   push:
-    branches: ["main"]
+    branches: ["codex/delete-files-and-create-personal-blog-project"]
 
 jobs:
   deploy:
