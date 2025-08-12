@@ -2,35 +2,59 @@ name: Deploy to Azure Functions
 
 on:
   push:
-    branches: ["d89rdl-codex/delete-files-and-create-personal-blog-project"]
+    branches:
+      - 'd89rdl-codex/delete-files-and-create-personal-blog-project'
+
+env:
+  AZURE_FUNCTIONAPP_NAME: dhaappsaznewf
+  FUNCTIONS_DIR: .   # <-- change if your app is in a subfolder (e.g. ./api)
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.10'
-      - name: Install Azure Functions Core Tools
+
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles(format('{0}/requirements.txt', env.FUNCTIONS_DIR)) }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Build dependencies into .python_packages
+        working-directory: ${{ env.FUNCTIONS_DIR }}
         run: |
-          sudo apt-get update
-          sudo apt-get install -y azure-functions-core-tools-4
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt --target .python_packages/lib/site-packages
+
+      - name: Create deployment package
+        working-directory: ${{ env.FUNCTIONS_DIR }}
+        run: |
+          zip -r ../package.zip * .python_packages
+
       - name: Azure Login
-        uses: azure/login@v1
+        uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
-      - name: Configure Functions runtime
+
+      # Optional but recommended: ensure run-from-package is enabled once for this app
+      # Replace <RESOURCE_GROUP> with your RG name or store it as a secret/var.
+      - name: Ensure WEBSITE_RUN_FROM_PACKAGE=1
         run: |
-          cat > local.settings.json <<'EOF'
-          {
-            "IsEncrypted": false,
-            "Values": {
-              "FUNCTIONS_WORKER_RUNTIME": "python",
-              "AzureWebJobsStorage": ""
-            }
-          }
-          EOF
-      - name: Publish
-        run: func azure functionapp publish dhaappsaznewf --python
+          az functionapp config appsettings set \
+            --resource-group <RESOURCE_GROUP> \
+            --name $AZURE_FUNCTIONAPP_NAME \
+            --settings WEBSITE_RUN_FROM_PACKAGE=1
+
+      - name: Deploy package to Function App
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
+          package: package.zip
