@@ -3,14 +3,15 @@ name: Deploy to Azure Functions
 on:
   push:
     branches:
-      - 'd89rdl-codex/delete-files-and-create-personal-blog-project'
+      - "d89rdl-codex/delete-files-and-create-personal-blog-project"
 
 env:
   AZURE_FUNCTIONAPP_NAME: dhaappsaznewf
-  FUNCTIONS_DIR: .   # <-- change if your app is in a subfolder (e.g. ./api)
+  AZURE_RESOURCE_GROUP: functionRG
+  FUNCTIONS_DIR: .   # change if your host.json is in a subfolder (e.g. ./api)
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -18,7 +19,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: "3.10"
 
       - name: Cache pip
         uses: actions/cache@v4
@@ -44,17 +45,16 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      # Optional but recommended: ensure run-from-package is enabled once for this app
-      # Replace <RESOURCE_GROUP> with your RG name or store it as a secret/var.
-      - name: Ensure WEBSITE_RUN_FROM_PACKAGE=1
+      - name: Ensure run-from-package is enabled
         run: |
           az functionapp config appsettings set \
-            --resource-group <RESOURCE_GROUP> \
-            --name $AZURE_FUNCTIONAPP_NAME \
+            --resource-group "$AZURE_RESOURCE_GROUP" \
+            --name "$AZURE_FUNCTIONAPP_NAME" \
             --settings WEBSITE_RUN_FROM_PACKAGE=1
 
-      - name: Deploy package to Function App
-        uses: azure/webapps-deploy@v3
-        with:
-          app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
-          package: package.zip
+      - name: Deploy zip to Function App
+        run: |
+          az functionapp deployment source config-zip \
+            --resource-group "$AZURE_RESOURCE_GROUP" \
+            --name "$AZURE_FUNCTIONAPP_NAME" \
+            --src package.zip
