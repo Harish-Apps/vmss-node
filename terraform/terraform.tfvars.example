@@ -1,0 +1,7 @@
+prefix      = "llmdemo"
+environment = "dev"
+location    = "eastus"
+vm_size     = "Standard_D2_v2"
+vm_priority = "Dedicated"
+max_nodes   = 1
+acr_sku     = "Premium"

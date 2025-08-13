@@ -1,0 +1,20 @@
+$schema: https://azuremlschemas.azureedge.net/latest/commandJob.schema.json
+type: command
+display_name: distilgpt2-finetune
+experiment_name: llm-demo
+
+environment: azureml:AzureML-pytorch-2.2-ubuntu20.04-py310-cpu@latest
+
+compute: azureml:llmdemo-dev-cpucc
+
+code: ..
+
+command: >
+  python src/train.py \
+  --model_name distilgpt2 \
+  --epochs 1 \
+  --batch_size 8 \
+  --lr 5e-5
+
+resources:
+  instance_count: 1
