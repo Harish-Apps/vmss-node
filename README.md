@@ -39,7 +39,7 @@ README.md
 bash scripts/deploy.sh
 ```
 
-This creates a resource group, storage account, key vault, application insights, container registry, Azure ML workspace and a CPU compute cluster.
+This creates a resource group, storage account, key vault, application insights, container registry, Azure ML workspace and a CPU compute cluster. Names include a random suffix to avoid conflicts with previously deleted resources.
 
 ## Submit the sample job
 
