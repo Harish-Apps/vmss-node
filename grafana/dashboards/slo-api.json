@@ -1,0 +1,38 @@
+{
+  "title": "API SLO Dashboard",
+  "uid": "slo-api",
+  "schemaVersion": 38,
+  "version": 1,
+  "panels": [
+    {
+      "type": "timeseries",
+      "title": "Availability",
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "1 - ( sum(rate(http_requests_total{job=\"apps-annotated\", status=~\"5..\"}[5m])) / sum(rate(http_requests_total{job=\"apps-annotated\"}[5m])) )"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Latency p95",
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(http_request_duration_seconds_bucket{job=\"apps-annotated\"}[5m])))"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Node CPU Saturation",
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "avg_over_time(node_cpu_seconds_total{mode!=\"idle\"}[5m]) / count_without(mode)(node_cpu_seconds_total)"
+        }
+      ]
+    }
+  ]
+}
