@@ -73,5 +73,5 @@ bash scripts/cleanup.sh
 ## Notes
 
 * The compute cluster scales down to zero when idle to minimize cost.
-* To train on GPU hardware, update `vm_size` in `terraform/terraform.tfvars` to a GPU SKU and change the job environment to a CUDA-enabled image such as `azureml:AzureML-acpt-pytorch-2.2-cuda12.1@latest`.
+* To train on GPU hardware, update `vm_size` in `terraform/terraform.tfvars` to a GPU SKU and change the job environment to a CUDA-enabled image such as `azureml:AzureML-acpt-pytorch-2.2-cuda12.1@latest`. The legacy variable `gpu_vm_size` is still accepted but will be removed in future releases.
 * For multi-node distributed training, increase `max_nodes` in `terraform/terraform.tfvars` and adjust `aml/job.yml` accordingly.

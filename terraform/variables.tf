@@ -19,6 +19,12 @@ variable "vm_size" {
   default = "Standard_D2_v2" # CPU SKU from Dv2 family
 }
 
+# Deprecated: retained for backward compatibility with older tfvars
+variable "gpu_vm_size" {
+  type    = string
+  default = null
+}
+
 variable "vm_priority" {
   type    = string
   default = "Dedicated" # or "LowPriority" for spot VMs

@@ -1,6 +1,10 @@
 # Current client (for KV tenant id)
 data "azurerm_client_config" "current" {}
 
+locals {
+  compute_vm_size = var.gpu_vm_size != null ? var.gpu_vm_size : var.vm_size
+}
+
 # Random suffix for globally-unique names
 resource "random_integer" "suffix" {
   min = 10000000
@@ -19,6 +23,10 @@ resource "azurerm_application_insights" "appi" {
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
   application_type    = "web"
+
+  lifecycle {
+    ignore_changes = [workspace_id]
+  }
 }
 
 # Key Vault
@@ -71,7 +79,7 @@ resource "azurerm_machine_learning_compute_cluster" "cpu" {
   machine_learning_workspace_id = azurerm_machine_learning_workspace.aml.id
 
   vm_priority = var.vm_priority                    # "Dedicated" or "LowPriority" for spot
-  vm_size     = var.vm_size
+  vm_size     = local.compute_vm_size
 
   # Scale to zero when idle (W3C duration, e.g. PT10M = 10 minutes)
   scale_settings {
