@@ -64,14 +64,14 @@ resource "azurerm_machine_learning_workspace" "aml" {
   identity { type = "SystemAssigned" }
 }
 
-# GPU Compute Cluster (AmlCompute)
-resource "azurerm_machine_learning_compute_cluster" "gpu" {
-  name                          = "${var.prefix}-${var.environment}-gpucc"
+# CPU Compute Cluster (AmlCompute)
+resource "azurerm_machine_learning_compute_cluster" "cpu" {
+  name                          = "${var.prefix}-${var.environment}-cpucc"
   location                      = azurerm_resource_group.rg.location
   machine_learning_workspace_id = azurerm_machine_learning_workspace.aml.id
 
-  vm_priority = var.vm_priority                    # "LowPriority" (spot) or "Dedicated"
-  vm_size     = var.gpu_vm_size
+  vm_priority = var.vm_priority                    # "Dedicated" or "LowPriority" for spot
+  vm_size     = var.vm_size
 
   # Scale to zero when idle (W3C duration, e.g. PT10M = 10 minutes)
   scale_settings {

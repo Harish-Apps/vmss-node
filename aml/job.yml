@@ -3,11 +3,11 @@ type: command
 display_name: distilgpt2-finetune
 experiment_name: llm-demo
 
-# run in curated CUDA PyTorch env (or swap to CPU env below)
-environment: azureml:AzureML-acpt-pytorch-2.2-cuda12.1@latest
+# run in curated PyTorch CPU environment
+environment: azureml:AzureML-pytorch-2.2-ubuntu20.04-py311-cpu@latest
 
 # set your compute (Terraform output)
-compute: azureml:llmdemo-dev-gpucc
+compute: azureml:llmdemo-dev-cpucc
 
 # your code root
 code: ..

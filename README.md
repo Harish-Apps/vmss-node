@@ -1,6 +1,6 @@
 # Azure LLM Training Platform
 
-This repository provides a minimal end-to-end setup for fine-tuning a small language model on Azure using Terraform and Azure Machine Learning (v2). It provisions all required Azure resources, deploys a GPU-enabled compute cluster that scales to zero when idle, and includes a sample job that fine-tunes DistilGPT‑2 on a tiny dataset.
+This repository provides a minimal end-to-end setup for fine-tuning a small language model on Azure using Terraform and Azure Machine Learning (v2). It provisions all required Azure resources, deploys a CPU-based compute cluster that scales to zero when idle, and includes a sample job that fine-tunes DistilGPT‑2 on a tiny dataset.
 
 ## Repository structure
 
@@ -39,7 +39,7 @@ README.md
 bash scripts/deploy.sh
 ```
 
-This creates a resource group, storage account, key vault, application insights, container registry, Azure ML workspace and a GPU compute cluster.
+This creates a resource group, storage account, key vault, application insights, container registry, Azure ML workspace and a CPU compute cluster.
 
 ## Submit the sample job
 
@@ -73,5 +73,5 @@ bash scripts/cleanup.sh
 ## Notes
 
 * The compute cluster scales down to zero when idle to minimize cost.
-* If you lack GPU quota, change `environment` in `aml/job.yml` to a CPU image such as `azureml:AzureML-sklearn-1.3-ubuntu20.04-py38-cpu@latest`.
+* To train on GPU hardware, update `vm_size` in `terraform/terraform.tfvars` to a GPU SKU and change the job environment to a CUDA-enabled image such as `azureml:AzureML-acpt-pytorch-2.2-cuda12.1@latest`.
 * For multi-node distributed training, increase `max_nodes` in `terraform/terraform.tfvars` and adjust `aml/job.yml` accordingly.

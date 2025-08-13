@@ -1,7 +1,7 @@
-prefix       = "llmdemo"
-environment  = "dev"
-location     = "eastus"
-gpu_vm_size  = "Standard_NC4as_T4_v3"
-vm_priority  = "LowPriority"
-max_nodes    = 1
-acr_sku      = "Premium"
+prefix      = "llmdemo"
+environment = "dev"
+location    = "eastus"
+vm_size     = "Standard_D2_v2"
+vm_priority = "Dedicated"
+max_nodes   = 1
+acr_sku     = "Premium"

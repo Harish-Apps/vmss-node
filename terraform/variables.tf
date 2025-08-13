@@ -14,14 +14,14 @@ variable "location" {
 }
 
 # Compute settings
-variable "gpu_vm_size" {
+variable "vm_size" {
   type    = string
-  default = "Standard_NC4as_T4_v3" # affordable T4
+  default = "Standard_D2_v2" # CPU SKU from Dv2 family
 }
 
 variable "vm_priority" {
   type    = string
-  default = "LowPriority" # or "Dedicated"
+  default = "Dedicated" # or "LowPriority" for spot VMs
 }
 
 variable "max_nodes" {
