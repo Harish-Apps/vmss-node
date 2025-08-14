@@ -1,0 +1,18 @@
+# PrometheusRule for Azure Monitor managed service for Prometheus
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: pod-availability
+  namespace: default
+spec:
+  groups:
+    - name: pod-availability
+      rules:
+        - alert: HighErrorRate
+          expr: 1 - (sum(rate(http_requests_total{job="prometheus-example-app",status!~"5.."}[5m])) / sum(rate(http_requests_total{job="prometheus-example-app"}[5m]))) > 0.01
+          for: 2m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Request error rate >1%"
+            description: "More than 1% of requests to prometheus-example-app failed in the last 5 minutes."

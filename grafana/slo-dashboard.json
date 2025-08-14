@@ -1,0 +1,25 @@
+{
+  "uid": "slo-dashboard",
+  "title": "AKS Sample SLO",
+  "timezone": "browser",
+  "schemaVersion": 36,
+  "version": 1,
+  "refresh": "30s",
+  "panels": [
+    {
+      "type": "timeseries",
+      "title": "Request Success Rate",
+      "targets": [
+        {
+          "expr": "sum(rate(http_requests_total{job=\"prometheus-example-app\",status!~\"5..\"}[5m])) / sum(rate(http_requests_total{job=\"prometheus-example-app\"}[5m]))",
+          "legendFormat": "success rate"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent"
+        }
+      }
+    }
+  ]
+}
