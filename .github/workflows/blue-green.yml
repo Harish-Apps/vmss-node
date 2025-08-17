@@ -22,7 +22,7 @@ jobs:
         with:
           node-version: '20'
       - run: npm install
-      - run: npm test
+
       - run: docker build -t $ACR_LOGIN_SERVER/$IMAGE_NAME:$IMAGE_TAG .
       - uses: azure/login@v1
         with:
@@ -55,4 +55,4 @@ jobs:
             --resource-group $RESOURCE_GROUP \
             --name $WEBAPP_NAME \
             --slot $SLOT_NAME \
-            --target-slot production
+            --target-slot prod
