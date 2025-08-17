@@ -2,7 +2,7 @@ name: Build and Deploy to Azure App Service (Blue-Green)
 
 on:
   push:
-    branches: [main]
+    branches: [codex/build-online-shopping-app-with-node.js]
   workflow_dispatch:
 
 env:
